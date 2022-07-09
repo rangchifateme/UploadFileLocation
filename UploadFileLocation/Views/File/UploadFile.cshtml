@@ -1,0 +1,253 @@
+﻿@model UploadFileLocation.Models.File
+
+@{
+    ViewBag.Title = "UploadFile";
+}
+
+<h2>UploadFile</h2>
+
+
+@using (Html.BeginForm("UploadFile", "File", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+<div class="form-horizontal">
+    <h4>File</h4>
+    <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @*<div class="form-group">
+            @Html.LabelFor(model => model.FileId, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.FileId, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.FileId, "", new { @class = "text-danger" })
+            </div>
+        </div>*@
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Filename, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @*@Html.EditorFor(model => model.Filename, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Filename, "", new { @class = "text-danger" })*@
+            <div>
+                @Html.TextBox("file", "", new { type = "file", @onChange = "display();" })  <br />
+                <input type="submit" value="Upload" />
+                @ViewBag.Message
+            </div>
+        </div>
+    </div>
+    @*<input type="button" value="Show My Position" onclick="display()">*@
+    <br>
+    <div id="result"></div>
+    @*<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&callback=initialize"></script>*@
+    <p id="successElement" style="display:none">Saved successfully</p>
+    <script type="text/javascript">
+
+
+
+        function display() {
+
+            //$("#result").empty();  // YOUR CODE GOES HERE
+            //$('#result').append(
+            //    '< input type = "text" name = "inputbox" value = "" id = "myTextBox" class="text-danger"/>',
+            //    '<button onclick="showFiles(' + "'" + document.getElementById("myTextBox") + "'" + ')" id="cityButton" > SaveCity </button > '
+            //);
+            navigator.geolocation.getCurrentPosition(
+
+                function (position) {
+                    var location = position.coords.latitude + ',' + position.coords.longitude;
+                    $.ajax({
+                        type: "POST",
+                        url: "GetCurrentLocation",
+                        data: JSON.stringify({ LatAndLong: location }),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        async: false, //_async,
+                        success: function (result) {
+                            console.log(result);
+                            if (result == true) {
+                                alert("saved successfully");
+                            }
+                            else {
+                                document.getElementById("city-form").style.display = "block";
+                            }
+                        }
+                    });
+
+                },
+                function (error) {
+                    document.getElementById("city-form").style.display = "block";
+                }
+            );
+        }
+
+
+
+    </script>
+
+    @* <div class="form-group">
+            @Html.LabelFor(model => model.FilePath, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.FilePath, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.FilePath, "", new { @class = "text-danger" })
+            </div>
+        </div>*@
+
+    @* <div class="form-group">
+            @Html.LabelFor(model => model.FileType, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.FileType, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.FileType, "", new { @class = "text-danger" })
+            </div>
+        </div>*@
+
+    @*<div class="form-group">
+            @Html.LabelFor(model => model.Fk_LocationId, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Fk_LocationId, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Fk_LocationId, "", new { @class = "text-danger" })
+            </div>
+        </div>*@
+
+    @*<div class="form-group">
+                  <div class="col-md-offset-2 col-md-10">
+                       <input type="submit" value="Create" class="btn btn-default" />
+          </div>
+        </div>*@
+</div>
+        }
+
+<div>
+    @*   @Html.ActionLink("Back to List", "Index")*@
+    <form id="city-form" style="display:none">
+        <label for="city-input-lbl">The city did not recognized enter your city name</label>
+        <input type="text" id="city-input"><br>
+
+        <!-- Button triggers new movie to be added -->
+        <input type="button" id="addCity" onclick="saveCity()" value="Add a city">
+    </form>
+</div>
+        <script src='https://code.jquery.com/jquery-2.1.3.min.js'></script>
+        <script type="text/javascript">
+            function saveCity() {
+                // YOUR CODE GOES HERE
+                var city = $('#city-input').val();
+                $.ajax({
+                    type: "POST",
+                    url: "Addcity",
+                    data: JSON.stringify({ cityNameInput: city }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    async: false, //_async,
+                    success: function (result) {
+                        if (result == true) {
+                            alert("saved successfully");
+                            document.getElementById("city-form").style.display = "none";
+                        }
+                        else {
+                            alert(" did not save successfully try again ! ");
+                        }
+                    },
+                    error: function (data) {
+                        alert(data);
+                    }
+                });
+
+            };
+
+        </script>
+
+        <div class="container">
+            @*<h1>Movie Search</h1>*@
+
+            <!-- Movies will get dumped here -->
+            <div id="moviesView">
+
+            </div>
+            <div id="fileContentView">
+
+            </div>
+
+            <form id="movie-form" style="display:block">
+                <!--<label for="movie-input">The city did not recognized enter your city name</label>
+        <input type="text" id="city-input"><br>-->
+                <!-- Button triggers new movie to be added -->
+                <!--<input id="addMovie" type="submit" value="Add a Movie Bro">-->
+            </form>
+
+        </div>
+                        <script src='https://code.jquery.com/jquery-2.1.3.min.js'></script>
+        <script type="text/javascript">
+            var folderNames = [];
+            var fileNames = [];
+            $.ajax({
+                type: "Post",
+            url: "GetSubDirectories",
+            // contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            async: false, //_async,
+            success: function (result) {
+            console.log(result);
+            folderNames = result;
+        },
+            error: function (data) {
+            console.log(data);
+        }
+        });
+            // Initial array of movies
+            // var movies = ['The Matrix', 'The Notebook', 'Mr. Nobody', 'The Lion King'];
+            //var movies = folderNames;
+            // ========================================================
+
+            // Generic function for displaying movie data
+            function renderFiles() {
+            $("#fileContentView").empty();  // YOUR CODE GOES HERE
+            for (var i = 0; i < fileNames.length; i++) {
+                $('#fileContentView').append('<a style="white-space: pre-line; top:3px">' + fileNames[i] + '\n</a>');
+        }
+
+        }
+            function renderButtons() {
+                $("#moviesView").empty();
+            for (var i = 0; i < folderNames.length; i++) {
+                $('#moviesView').append(
+                    '<button onclick="showFiles(' + "'" + folderNames[i] + "'" + ')" id="but' + folderNames[i] + '" >'
+                    + folderNames[i] +
+                    '</button>'
+                );
+        }
+        }
+            function showFiles(directory) {
+                $.ajax({
+                    type: "POST",
+                    url: "GetFileNames",
+                    data: JSON.stringify({ cityName: directory }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    async: false, //_async,
+                    success: function (result) {
+                        fileNames = result;
+                        renderFiles();
+                        console.log(result);
+                    },
+                    error: function (data) {
+                        console.log(data);
+                    }
+                });
+            }
+
+            // ========================================================
+
+            // This function handles events where one button is clicked
+
+
+            // ========================================================
+
+            // This calls the renderButtons() function
+            renderButtons();
+        </script>
+
+
+        @section Scripts {
+            @Scripts.Render("~/bundles/jqueryval")
+        }
